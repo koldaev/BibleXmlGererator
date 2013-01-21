@@ -22,19 +22,24 @@ public class SuperClassGenerator {
 		connInfo.put("password", "zxasqw12");
 	}
 
-	Connection			conn  = null;        
+	Connection			conn  = null; 
 	//переменные генерации классов Библии
 	PreparedStatement   pstmt = null;
     ResultSet         	rs    = null;
     //переменные названий книг Библии
     PreparedStatement   namebooks = null;
     ResultSet           rnamebooks    = null;
+  //переменные названий стихов Библии
+    PreparedStatement   poembooks = null;
+    ResultSet           rpoembooks    = null;
     //xml-файл
     FileWriter fstreamxml = null;
     
     BufferedWriter outfstreamxml = null;
 
     File dir;
+    
+    static int[] bookchapters = new int[67];
     
 	public SuperClassGenerator(String inlang) throws SQLException, IOException {
 		langtoxml = inlang;
@@ -70,12 +75,39 @@ public class SuperClassGenerator {
 		if (namebooks.execute()) {
         	rnamebooks = namebooks.getResultSet();
         	while(rnamebooks.next()) {
-        		outfstreamxml.write("\t\t<book=\"" + rnamebooks.getString("biblename")  + "\" chapters=\""+rnamebooks.getString("chapters")+"\"/>\n");
+        		Integer id = rnamebooks.getInt("idbible");
+        		bookchapters[id] = rnamebooks.getInt("chapters");
+        		outfstreamxml.write("\t\t<book=\"" + rnamebooks.getString("biblename")  + "\" idbook=\"book" + id + "\" chapters=\""+rnamebooks.getString("chapters")+"\"/>\n");
         	}
         	outfstreamxml.write("\t</booknames>\n");
 		}
+		
+		booktext();
+		
 		outfstreamxml.write("</biblexml>");
 		outfstreamxml.close();
+	}
+
+	private void booktext() throws SQLException, IOException {
+		for(int i=1;i<=66;i++) {
+			outfstreamxml.write("\t<booktext id=\"book" + i + "\">\n");
+			
+				for(int k=1;k<=bookchapters[i];k++) {
+					outfstreamxml.write("\t\t<chapter id=\"book"+i+"."+k+"\">\n");
+					
+					poembooks = conn.prepareStatement("SELECT * FROM "+langtoxml+"text where bible = " + i + " and chapter = " + k);
+					if (poembooks.execute()) {
+						rpoembooks = poembooks.getResultSet();
+						while(rpoembooks.next()) {
+							outfstreamxml.write("\t\t\t<verse id=\""+i+"."+k+"."+rpoembooks.getInt("poem")+"\">"+rpoembooks.getString("poemtext")+"</verse>\n");
+						}
+					}
+					
+					outfstreamxml.write("\t\t</chapter>\n");
+				}
+			
+			outfstreamxml.write("\t</booktext>\n");
+		}
 	}
 
 }
