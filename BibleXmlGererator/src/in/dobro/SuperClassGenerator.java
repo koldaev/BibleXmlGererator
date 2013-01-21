@@ -77,7 +77,7 @@ public class SuperClassGenerator {
         	while(rnamebooks.next()) {
         		Integer id = rnamebooks.getInt("idbible");
         		bookchapters[id] = rnamebooks.getInt("chapters");
-        		outfstreamxml.write("\t\t<book=\"" + rnamebooks.getString("biblename")  + "\" idbook=\"book" + id + "\" chapters=\""+rnamebooks.getString("chapters")+"\"/>\n");
+        		outfstreamxml.write("\t\t<book name=\"" + rnamebooks.getString("biblename")  + "\" idbook=\"book" + id + "\" chapters=\""+rnamebooks.getString("chapters")+"\"/>\n");
         	}
         	outfstreamxml.write("\t</booknames>\n");
 		}
