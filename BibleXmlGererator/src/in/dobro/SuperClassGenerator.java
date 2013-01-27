@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,6 +15,8 @@ import java.util.Properties;
 public class SuperClassGenerator {
 	
 	static String langtoxml;
+	static String[] strfield = null;
+	
 	
 	static Properties connInfo = new Properties();
 	static {
@@ -41,9 +44,16 @@ public class SuperClassGenerator {
     
     static int[] bookchapters = new int[67];
     
-	public SuperClassGenerator(String inlang) throws SQLException, IOException {
+	public SuperClassGenerator(String inlang) throws SQLException, IOException, ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		langtoxml = inlang;
+		
+		//достаем точную локализацию из массива  
+        Class cl = Class.forName("in.dobro.names");
+		Field outext = cl.getDeclaredField(langtoxml + "names");
+		strfield = (String[])outext.get(cl);
+		
 		pregeneratorxml();
+		
 	}
 
 	private void pregeneratorxml() throws SQLException, IOException {
@@ -56,16 +66,16 @@ public class SuperClassGenerator {
 	}
 
 	private void filecreate() throws IOException {
-		fstreamxml = new FileWriter(dir+"/"+langtoxml+"_bible.xml");
+		fstreamxml = new FileWriter(dir+"/"+langtoxml+"bible.xml");
 		outfstreamxml = new BufferedWriter(fstreamxml);
 		outfstreamxml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 		outfstreamxml.write("<biblexml>\n");
 		outfstreamxml.write("\t<descripion>\n");
-		outfstreamxml.write("\t\t<version language=\""+langtoxml+"\">Библия. Русский Синодальный перевод</version>\n");
+		outfstreamxml.write("\t\t<version language=\""+langtoxml+"\">"+strfield[0]+"</version>\n");
 		outfstreamxml.write("\t</descripion>\n");
 		outfstreamxml.write("\t<chapterviews>\n");
-		outfstreamxml.write("\t\t<chapter name=\"Глава\"/>\n");
-		outfstreamxml.write("\t\t<psalom name=\"Псалом\"/>\n");
+		outfstreamxml.write("\t\t<chapter name=\""+strfield[2]+"\"/>\n");
+		outfstreamxml.write("\t\t<psalom name=\""+strfield[9]+"\"/>\n");
 		outfstreamxml.write("\t</chapterviews>\n");
 		outfstreamxml.write("\t<booknames>\n");
 		
