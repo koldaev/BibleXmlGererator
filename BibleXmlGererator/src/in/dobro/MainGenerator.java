@@ -15,7 +15,7 @@ public class MainGenerator extends SuperClassGenerator {
 		//Scanner in = new Scanner(System.in);
         //while(true) {
         //	System.out.println("\nПожалуйста, введите один язык Библии как домен страны, например ru\n\n");
-    		String lang = "zh";
+    		String lang = "th";
         	new MainGenerator(lang);
         //} 
 	}
